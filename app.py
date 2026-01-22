@@ -14,32 +14,32 @@ if not google_api_key:
     raise ValueError("GOOGLE_API_KEY not found in environment variables")
 
 llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    google_api_key=google_api_key
+    model = "gemini-2.5-flash",
+    google_api_key = google_api_key
 )
 
-app = FastAPI(title="VerifyBot API", description="AI Assistant for Verify Platform")
+app = FastAPI(title = "VerifyBot API", description = "AI Assistant for Verify Platform")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins = ["*"], 
+    allow_credentials = True,
+    allow_methods = ["*"],
+    allow_headers = ["*"],
 )
 
 conversations = {}
 
 class ChatRequest(BaseModel):
-    message: str
-    session_id: str
+    message : str
+    session_id : str
 
 class ChatResponse(BaseModel):
-    response: str
-    session_id: str
+    response : str
+    session_id : str
 
 class ClearHistoryRequest(BaseModel):
-    session_id: str
+    session_id : str
 
 SYSTEM_PROMPT = """You are VerifyBot, the official AI assistant of Verify — a secure AI-powered platform designed to eliminate fake degrees and certificates. 
 Verify uses blockchain, AI, and OCR to authenticate both physical and digital certificates issued by verified universities.
@@ -61,52 +61,52 @@ Tech Stack (for context): TypeScript, React, FastAPI, Node.js, AWS, MongoDB, Eth
 Whenever uncertain, ask clarifying questions before responding. Always emphasize security, authenticity, and transparency.
 """
 
-def get_or_create_history(session_id: str) -> List:
+def get_or_create_history(session_id : str) -> List:
     if session_id not in conversations:
         conversations[session_id] = [SystemMessage(content=SYSTEM_PROMPT)]
     return conversations[session_id]
 
 @app.get("/")
 async def root():
-    return {"message": "VerifyBot API is running. Use POST /chat to send messages."}
+    return {"message" : "VerifyBot API is running. Use POST /chat to send messages."}
 
-@app.post("/chat", response_model=ChatResponse)
-async def chat(request: ChatRequest):
+@app.post("/chat", response_model = ChatResponse)
+async def chat(request : ChatRequest):
     try:
         if not request.message.strip():
-            raise HTTPException(status_code=400, detail="Message cannot be empty")
+            raise HTTPException(status_code = 400, detail = "Message cannot be empty")
         
         history = get_or_create_history(request.session_id)
         
-        history.append(HumanMessage(content=request.message))
+        history.append(HumanMessage(content = request.message))
         
         response = llm.invoke(history)
         bot_message = response.content
         
-        history.append(AIMessage(content=bot_message))
+        history.append(AIMessage(content = bot_message))
         
         return ChatResponse(
-            response=bot_message,
-            session_id=request.session_id
+            response = bot_message,
+            session_id = request.session_id
         )
     
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error processing message: {str(e)}")
+        raise HTTPException(status_code = 500, detail = f"Error processing message: {str(e)}")
 
 @app.post("/clear-history")
-async def clear_history(request: ClearHistoryRequest):
+async def clear_history(request : ClearHistoryRequest):
     try:
         if request.session_id in conversations:
-            conversations[request.session_id] = [SystemMessage(content=SYSTEM_PROMPT)]
-        return {"message": "Conversation history cleared", "session_id": request.session_id}
+            conversations[request.session_id] = [SystemMessage(content = SYSTEM_PROMPT)]
+        return {"message" : "Conversation history cleared", "session_id" : request.session_id}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error clearing history: {str(e)}")
+        raise HTTPException(status_code = 500, detail = f"Error clearing history: {str(e)}")
 
 @app.get("/health")
 async def health_check():
-    return {"status": "ok", "service": "VerifyBot API"}
+    return {"status" : "ok", "service" : "VerifyBot API"}
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host = "0.0.0.0", port = 8000)
 
