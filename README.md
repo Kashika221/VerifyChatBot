@@ -1,8 +1,10 @@
 # VerifyChatBot
 
-**VerifyChatBot** is a Python-based chatbot application designed to handle [Insert specific purpose here, e.g., user verification, automated customer support, or data validation]. 
+**VerifyChatBot** is a high-performance AI assistant built with FastAPI and Google Gemini 2.5. It serves as the intelligent support interface for the Verify Platform—a secure ecosystem designed to eliminate fake degrees and certificates using Blockchain, AI, and OCR technologies.
 
-This repository contains the source code and dependencies required to run the chatbot locally.
+This bot is engineered to guide students, university administrators, and verifiers through complex validation processes, including Ethereum blockchain integration, MetaMask wallet connections, and certificate analysis via YOLOv11 and Tesseract OCR.
+
+This repository contains the source code and dependencies required to deploy the chatbot API locally or in a cloud environment.
 
 ## Repository Structure
 
